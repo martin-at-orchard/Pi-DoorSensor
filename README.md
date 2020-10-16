@@ -191,8 +191,95 @@ Everything from this point can be performed via the keyboard attached to the Ras
     * Log into PhpMyAdmin using the `staff` and `DATABASE-PASSWORD`
 * Configure the database tables
   
-  **TO DO**
-    
+  * Create the gpio table
+
+    ```sql
+    CREATE TABLE `gpio` (
+      `id` int(10) UNSIGNED NOT NULL,
+      `pin` int(10) UNSIGNED NOT NULL,
+      `name` varchar(100) NOT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
+
+    ALTER TABLE `gpio`
+      ADD PRIMARY KEY (`id`);
+    ```
+
+  * Insert the data into the gpio table
+
+    ```sql
+    INSERT INTO `gpio` (`id`, `pin`, `name`) VALUES
+      (0, 27, 'GPIO 00 (ID_SD)'),
+      (1, 28, 'GPIO 01 (ID_SC)'),
+      (2, 3, 'GPIO 02 (SDA1, I2C)'),
+      (3, 5, 'GPIO 03 (SCL1, I2C)'),
+      (4, 7, 'GPIO 04 (GPCLCK0)'),
+      (5, 29, 'GPIO 05'),
+      (6, 31, 'GPIO 06'),
+      (7, 26, 'GPIO 07 (SPI0_CE1_N)'),
+      (8, 24, 'GPIO 08 (SPI0_CE0_N)'),
+      (9, 21, 'GPIO 09 (SPI0_MISO)'),
+      (10, 19, 'GPIO 10 (SPI0_MOSI)'),
+      (11, 23, 'GPIO 11 (SPI0_CLK)'),
+      (12, 32, 'GPIO 12 (PWM0)'),
+      (13, 33, 'GPIO 13 (PWM1)'),
+      (14, 8, 'GPIO 14 (TXD0, UART)'),
+      (15, 10, 'GPIO 15 (RXD0, UART)'),
+      (16, 36, 'GPIO 16'),
+      (17, 11, 'GPIO 17'),
+      (18, 12, 'GPIO 18 (PWM0)'),
+      (19, 35, 'GPIO 19 (PCM_FS)'),
+      (20, 38, 'GPIO 20 (PCM_DIN)'),
+      (21, 40, 'GPIO 21 (PCM_DOUT)'),
+      (22, 15, 'GPIO 22'),
+      (23, 16, 'GPIO 23'),
+      (24, 18, 'GPIO 24'),
+      (25, 22, 'GPIO 25'),
+      (26, 37, 'GPIO 26'),
+      (27, 13, 'GPIO 27');
+
+    ALTER TABLE `gpio`
+      MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+    ```
+
+  * Create the rooms table
+
+    ```sql
+    CREATE TABLE `rooms` (
+      `id` int(10) UNSIGNED NOT NULL,
+      `enabled` int(10) UNSIGNED NOT NULL DEFAULT 1,
+      `gpio` int(10) UNSIGNED NOT NULL,
+      `displayorder` int(10) UNSIGNED NOT NULL,
+      `name` varchar(100) NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    ALTER TABLE `rooms`
+      ADD PRIMARY KEY (`id`);
+    ```
+
+  * Insert the data into the rooms table
+
+    ```sql
+    INSERT INTO `rooms` (`id`, `enabled`, `gpio`, `displayorder`, `name`) VALUES
+      (1, 1, 4, 1, 'Room 1'),
+      (2, 1, 5, 2, 'Room 2'),
+      (3, 1, 6, 3, 'Room 3'),
+      (4, 1, 12, 4, 'Room 4'),
+      (5, 1, 13, 5, 'Room 5'),
+      (6, 1, 16, 6, 'Room 6'),
+      (7, 1, 17, 7, 'Room 7'),
+      (8, 1, 18, 8, 'Room 8'),
+      (9, 1, 19, 9, 'Room 9'),
+      (10, 1, 20, 10, 'Room 10'),
+      (11, 1, 21, 11, 'Room 11'),
+      (12, 1, 22, 12, 'Room 12'),
+      (13, 1, 23, 13, 'Room 13'),
+      (14, 1, 24, 14, 'Laundry Room'),
+      (15, 1, 25, 15, 'TV Room');
+
+    ALTER TABLE `rooms`
+      MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+    ```
+
 * Setup Python 3 for MariaDb, GPIO access
   ```script
   sudo apt install python3-pip -y

@@ -278,6 +278,24 @@ Everything from this point can be performed via the keyboard attached to the Ras
 
     ALTER TABLE `rooms`
       MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+    
+    ALTER TABLE `rooms` 
+      ADD CONSTRAINT `fk_g_id` FOREIGN KEY (`gpio`) REFERENCES `gpio`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+    ```
+
+    * Create the results table
+
+    ```sql
+    CREATE TABLE `results` (
+        `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        `room` INT UNSIGNED NOT NULL,
+        `status` INT UNSIGNED NOT NULL,
+        `date` DATETIME NOT NULL,
+        PRIMARY KEY (`id`)
+    ) ENGINE = InnoDB;
+
+    ALTER TABLE `results`
+      ADD CONSTRAINT `fk_ro_id` FOREIGN KEY (`room`) REFERENCES `rooms`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
     ```
 
 * Setup Python 3 for MariaDb, GPIO access
@@ -300,7 +318,7 @@ Everything from this point can be performed via the keyboard attached to the Ras
 * Copy all the code files from the GIT repository (use git clone or download the zipped files)
 * Make the python files executable
   `chmod +x *.py`
-* Create a file `config.json` and enter the following:
+* Create a file `config.json` (**NOTE:** This file should **NOT** be committed into the GIT repository)
   ```json
   {
       "user": "staff",
@@ -313,9 +331,30 @@ Everything from this point can be performed via the keyboard attached to the Ras
 * Start up the program 
   `./doorsensor`
 
+## DEBUGGING
 
+### PhpMyAdmin and PHP 7.3
 
-    
-    
-    
-    
+There is a bug with the current PhpMyAdmin (4.6.6deb5) and the current PHP (7.3.19-1~deb10u1)
+that displays an error when displaying the results of a query or browsing a table.
+Apparently this is fixed in PhpMyAdmin 4.8.3 and above, but this isn't available through
+the normal `apt install` process right now.
+
+They can be fixed by this **HACK**
+
+In the directory `/usr/share/phpmyadmin/libraries` make changes to the following files
+
+**plugin_interface.lib.php**
+Change line **551**
+From `if ($options != null && count($options) > 0) {`
+To   `if ($options != null && (is_array($options) || $options instanceof Countable) && count($options) > 0) {`
+
+**sql.lib.php**
+Change line **613**
+From `|| (count($analyzed_sql_results['select_expr'] == 1)`
+To   `|| ((count($analyzed_sql_results['select_expr']) == 1)`
+
+**Restart nginx**
+```script
+sudo /etc/init.d/nginx restart
+```

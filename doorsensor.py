@@ -4,13 +4,16 @@
 #
 # Author:  Martin Wedepohl <martin@orchardrecovery.com>
 #
-# Date:    October 15, 2020 - 0.1 - Original Issue
+# Date:     August  6, 2020 - 0.1 - Original Issue
+#          October 15, 2020 - 0.2 - Loaded into VSC and linted
 #
-# Version: 0.1
+# Version: 0.2
 
 ######################################################
 # Module Imports
 ######################################################
+#import mariadb
+#import sys
 from pins import monitorDoors
 
 ######################################################

@@ -4,9 +4,12 @@
 #
 # Author:  Martin Wedepohl <martin@orchardrecovery.com>
 #
-# Date:    October 15, 2020 - 0.1 - Original Issue
+# Date:     August 26, 2020 - 0.1 - Original Issue
+#          October 15, 2020 - 0.2 - Loaded into VSC and linted
 #
-# Version: 0.1
+# Version: 0.2
+#
+######################################################
 
 ######################################################
 # Module Imports
@@ -20,12 +23,14 @@ import threading
 ######################################################
 # Function Imports
 ######################################################
-from rooms import getpins
+from rooms import getrooms
+from rooms import updateresults
 from datetime import datetime
 
 ######################################################
 # Global lists and variables
 ######################################################
+rids = []
 pins = []
 rooms = []
 ids = []
@@ -35,6 +40,7 @@ states = []
 debounce = 0.01
 stdscr = None
 
+dbLock = None
 closedLock = None
 openLock = None
 inOpen = None
@@ -70,6 +76,25 @@ class sensorBeep(threading.Thread):
                 os.system('mpg123 -q open_beep.mp3')
                 inOpen = None
                 openLock.release()
+
+######################################################
+# Database Update Threading class
+######################################################
+
+
+class updateDb(threading.Thread):
+    def __init__(self, room, status, date):
+        threading.Thread.__init__(self)
+        self.room = room
+        self.status = status
+        self.date = date
+
+    def run(self):
+        global dbLock
+        global rids
+        dbLock.acquire()
+        updateresults(rids[self.room], self.status, self.date)
+        dbLock.release()
 
 ######################################################
 # Setup GPIO
@@ -143,6 +168,7 @@ def buttonStateChanged(pin):
             states[i] = state
             times[i] = datetime.now()
             ftime = times[i].strftime("%Y-%m-%d %H:%M:%S")
+            status = state
             if (0 == state):
                 state = 'Closed'
                 attr = curses.color_pair(2)
@@ -152,6 +178,8 @@ def buttonStateChanged(pin):
             stdscr.addstr(i, 20, state, attr)
             stdscr.addstr(i, 30, ftime)
             stdscr.refresh()
+            doUpdateDb = updateDb(i, status, ftime)
+            doUpdateDb.start()
             doBeep = sensorBeep(state)
             doBeep.start()
 
@@ -162,6 +190,7 @@ def buttonStateChanged(pin):
 
 
 def initialize():
+    global rids
     global pins
     global rooms
     global times
@@ -169,10 +198,11 @@ def initialize():
     global stdscr
 
     # Get the room/pin info from the database
-    roomdata = getpins()
+    roomdata = getrooms()
 
     # Set up the global arrays
-    for roomname, pin in roomdata:
+    for rid, roomname, pin in roomdata:
+        rids.append(rid)
         pins.append(pin)
         rooms.append(roomname)
         times.append(None)
@@ -202,12 +232,14 @@ def initialize():
 
 
 def monitorDoors():
+    global dbLock
     global closedLock
     global openLock
 
     # Initialize the door sensors
     initialize()
 
+    dbLock = threading.Lock()
     closedLock = threading.Lock()
     openLock = threading.Lock()
 

@@ -6,8 +6,9 @@
 #
 # Date:     August 26, 2020 - 0.1 - Original Issue
 #          October 15, 2020 - 0.2 - Loaded into VSC and linted
+#         November 12, 2020 - 0.3 - Added ability to have X/Y offset
 #
-# Version: 0.2
+# Version: 0.3
 #
 ######################################################
 
@@ -36,6 +37,8 @@ rooms = []
 ids = []
 times = []
 states = []
+offsetX = 0
+offsetY = 0
 
 debounce = 0.01
 stdscr = None
@@ -128,6 +131,8 @@ def initializeDisplay():
     global times
     global states
     global stdscr
+    global offsetX
+    global offsetY
 
     numPins = len(pins)
 
@@ -141,9 +146,9 @@ def initializeDisplay():
             state = ' OPEN '
             attr = curses.color_pair(1) | curses.A_BOLD
 
-        stdscr.addstr(i,  0, room)
-        stdscr.addstr(i, 20, state, attr)
-        stdscr.addstr(i, 30, ftime)
+        stdscr.addstr(i + offsetY,  0 + offsetX, room)
+        stdscr.addstr(i + offsetY, 20 + offsetX, state, attr)
+        stdscr.addstr(i + offsetY, 30 + offsetX, ftime)
 
     stdscr.refresh()
 
@@ -159,6 +164,8 @@ def buttonStateChanged(pin):
     global rooms
     global states
     global stdscr
+    global offsetX
+    global offsetY
 
     state = GPIO.input(pin)
     i = pins.index(pin)
@@ -175,8 +182,8 @@ def buttonStateChanged(pin):
             else:
                 state = ' OPEN '
                 attr = curses.color_pair(1) | curses.A_BOLD
-            stdscr.addstr(i, 20, state, attr)
-            stdscr.addstr(i, 30, ftime)
+            stdscr.addstr(i + offsetY, 20 + offsetX, state, attr)
+            stdscr.addstr(i + offsetY, 30 + offsetX, ftime)
             stdscr.refresh()
             doUpdateDb = updateDb(i, status, ftime)
             doUpdateDb.start()

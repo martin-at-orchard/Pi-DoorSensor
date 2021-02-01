@@ -6,8 +6,9 @@
 #
 # Date:     August  6, 2020 - 0.1 - Original Issue
 #          October 15, 2020 - 0.2 - Loaded into VSC and linted
+#         November 12, 2020 - 0.3 - pins.py and rooms.py update
 #
-# Version: 0.2
+# Version: 0.3
 
 ######################################################
 # Module Imports

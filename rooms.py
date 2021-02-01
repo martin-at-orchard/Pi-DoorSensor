@@ -4,10 +4,11 @@
 #
 # Author:  Martin Wedepohl <martin@orchardrecovery.com>
 #
-# Date:     August  6, 2020 - 0.1 - Original Issue
-#          October 15, 2020 - 0.2 - Loaded into VSC and linted
+# Date:    August  6, 2020   - 0.1 - Original Issue
+#          October 15, 2020  - 0.2 - Loaded into VSC and linted
+#          November 10, 2020 - 0.3 - Fixed up path for config.json
 #
-# Version: 0.2
+# Version: 0.3
 
 ######################################################
 # Module Imports
@@ -24,8 +25,13 @@ import sys
 def getConnection():
     # Connect in a try block
     try:
-        with open('config.json', 'r') as f:
+        with open('/home/pi/work/doorsensor/config.json', 'r') as f:
             config = json.load(f)
+
+        if 'true' == config['enable']:
+            enable = True
+        else:
+            enable = False
 
         conn = mariadb.connect(
             user=config['user'],
@@ -33,7 +39,7 @@ def getConnection():
             host=config['host'],
             database=config['database']
         )
-        return conn
+        return conn, enable
 
     except mariadb.Error as e:
         print(f"Error connecting to MariaDB Database: {e}")
@@ -49,7 +55,8 @@ def getrooms():
     # Connect in a try block
     try:
 
-        conn = getConnection()
+        result = getConnection()
+        conn = result[0]
         cur = conn.cursor()
 
         # Get the rooms/pins information
@@ -83,14 +90,18 @@ def updateresults(room, status, date):
     # Connect in a try block
     try:
 
-        conn = getConnection()
+        result = getConnection()
+        conn = result[0]
+        enable = result[1]
         cur = conn.cursor()
+        numinserts = 0
 
-        sql = "INSERT INTO results (room, status, date) VALUES(%d, %d, %s)"
-        data = (room, status, date)
-        cur.execute(sql, data)
-        conn.commit()
-        numinserts = cur.rowcount
+        if True == enable:
+            sql = "INSERT INTO results (room, status, date) VALUES(%d, %d, %s)"
+            data = (room, status, date)
+            cur.execute(sql, data)
+            conn.commit()
+            numinserts = cur.rowcount
 
         conn.close()
 

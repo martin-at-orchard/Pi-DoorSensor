@@ -18,8 +18,10 @@
 import RPi.GPIO as GPIO
 import time
 import curses
-import os
+# import os
 import threading
+import json
+import subprocess
 
 ######################################################
 # Function Imports
@@ -39,15 +41,13 @@ times = []
 states = []
 offsetX = 0
 offsetY = 0
+writeDb = False
 
-debounce = 0.01
+debounce = 0.02
 stdscr = None
 
 dbLock = None
-closedLock = None
-openLock = None
-inOpen = None
-inClosed = None
+beepLock = None
 
 ######################################################
 # Beep Threading class
@@ -60,25 +60,16 @@ class sensorBeep(threading.Thread):
         self.state = state
 
     def run(self):
-        global openLock
-        global closedLock
-        global inOpen
-        global inClosed
+        global beepLock
 
-        if ('Closed' == self.state):
-            if (inClosed is None):
-                inClosed = True
-                closedLock.acquire()
-                os.system('mpg123 -q close_beep.mp3')
-                inClosed = None
-                closedLock.release()
-        else:
-            if (inOpen is None):
-                inOpen = True
-                openLock.acquire()
-                os.system('mpg123 -q open_beep.mp3')
-                inOpen = None
-                openLock.release()
+        if ' OPEN ' == self.state:
+            if False == beepLock.locked():
+                beepLock.acquire(False)
+
+                if True == beepLock.locked():
+                    # os.system('mpg123 -q open_beep.mp3')
+                    subprocess.run([ 'mpg123', 'open_beep.mp3'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    beepLock.release()
 
 ######################################################
 # Database Update Threading class
@@ -166,6 +157,7 @@ def buttonStateChanged(pin):
     global stdscr
     global offsetX
     global offsetY
+    global writeDb
 
     state = GPIO.input(pin)
     i = pins.index(pin)
@@ -185,8 +177,11 @@ def buttonStateChanged(pin):
             stdscr.addstr(i + offsetY, 20 + offsetX, state, attr)
             stdscr.addstr(i + offsetY, 30 + offsetX, ftime)
             stdscr.refresh()
-            doUpdateDb = updateDb(i, status, ftime)
-            doUpdateDb.start()
+
+            if True == writeDb:
+                doUpdateDb = updateDb(i, status, ftime)
+                doUpdateDb.start()
+
             doBeep = sensorBeep(state)
             doBeep.start()
 
@@ -203,6 +198,16 @@ def initialize():
     global times
     global states
     global stdscr
+    global writeDb
+
+    # Read the configuration to see if we are updating the database
+    with open('/home/pi/work/doorsensor/config.json', 'r') as f:
+        config = json.load(f)
+
+    if 'true' == config['enable']:
+        writeDb = True
+    else:
+        writeDb = False
 
     # Get the room/pin info from the database
     roomdata = getrooms()
@@ -240,15 +245,16 @@ def initialize():
 
 def monitorDoors():
     global dbLock
-    global closedLock
-    global openLock
+    global beepLock
+    global writeDb
 
     # Initialize the door sensors
     initialize()
 
-    dbLock = threading.Lock()
-    closedLock = threading.Lock()
-    openLock = threading.Lock()
+    if True == writeDb:
+        dbLock = threading.Lock()
+
+    beepLock = threading.Lock()
 
     try:
 

@@ -4,12 +4,6 @@
 #
 # Author:  Martin Wedepohl <martin@orchardrecovery.com>
 #
-# Date:     August 26, 2020 - 0.1 - Original Issue
-#          October 15, 2020 - 0.2 - Loaded into VSC and linted
-#         November 12, 2020 - 0.3 - Added ability to have X/Y offset
-#
-# Version: 0.3
-#
 ######################################################
 
 ######################################################
@@ -18,7 +12,6 @@
 import RPi.GPIO as GPIO
 import time
 import curses
-# import os
 import threading
 import json
 import subprocess
@@ -43,7 +36,6 @@ offsetX = 0
 offsetY = 0
 writeDb = False
 
-debounce = 0.02
 stdscr = None
 
 dbLock = None
@@ -67,7 +59,6 @@ class sensorBeep(threading.Thread):
                 beepLock.acquire(False)
 
                 if True == beepLock.locked():
-                    # os.system('mpg123 -q open_beep.mp3')
                     subprocess.run([ 'mpg123', 'open_beep.mp3'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                     beepLock.release()
 
@@ -108,6 +99,7 @@ def setupGPIO():
     numPins = len(pins)
     for i in range(numPins):
         GPIO.setup(pins[i], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.add_event_detect(pins[i], GPIO.BOTH, callback=buttonStateChanged, bouncetime=200)
         times[i] = datetime.now()
         states[i] = GPIO.input(pins[i])
 
@@ -159,31 +151,30 @@ def buttonStateChanged(pin):
     global offsetY
     global writeDb
 
+    time.sleep(.01)
     state = GPIO.input(pin)
     i = pins.index(pin)
     if state is not states[i]:
-        elapsed = (datetime.now() - times[i]).total_seconds()
-        if elapsed > debounce:
-            states[i] = state
-            times[i] = datetime.now()
-            ftime = times[i].strftime("%Y-%m-%d %H:%M:%S")
-            status = state
-            if (0 == state):
-                state = 'Closed'
-                attr = curses.color_pair(2)
-            else:
-                state = ' OPEN '
-                attr = curses.color_pair(1) | curses.A_BOLD
-            stdscr.addstr(i + offsetY, 20 + offsetX, state, attr)
-            stdscr.addstr(i + offsetY, 30 + offsetX, ftime)
-            stdscr.refresh()
+        states[i] = state
+        times[i] = datetime.now()
+        ftime = times[i].strftime("%Y-%m-%d %H:%M:%S")
+        status = state
+        if (0 == state):
+            state = 'Closed'
+            attr = curses.color_pair(2)
+        else:
+            state = ' OPEN '
+            attr = curses.color_pair(1) | curses.A_BOLD
+        stdscr.addstr(i + offsetY, 20 + offsetX, state, attr)
+        stdscr.addstr(i + offsetY, 30 + offsetX, ftime)
+        stdscr.refresh()
 
-            if True == writeDb:
-                doUpdateDb = updateDb(i, status, ftime)
-                doUpdateDb.start()
+        if True == writeDb:
+            doUpdateDb = updateDb(i, status, ftime)
+            doUpdateDb.start()
 
-            doBeep = sensorBeep(state)
-            doBeep.start()
+        doBeep = sensorBeep(state)
+        doBeep.start()
 
 ######################################################
 # Initialize all the global arrays and set up the
@@ -231,11 +222,6 @@ def initialize():
 
     # Initialize the screen with the room numbers and states
     initializeDisplay()
-
-    # Set up the GPIO handler
-    numPins = len(pins)
-    for i in range(numPins):
-        GPIO.add_event_detect(pins[i], GPIO.BOTH, callback=buttonStateChanged)
 
 ######################################################
 # Initialize the monitor all the doors

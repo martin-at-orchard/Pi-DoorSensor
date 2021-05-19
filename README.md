@@ -124,7 +124,7 @@ Everything from this point can be performed via the keyboard attached to the Ras
     * Create a new database user (staff)
       * `CREATE USER 'staff'@'localhost' IDENTIFIED BY 'DATABASE-PASSWORD';` ** MAKE SURE TO CHANGE THE PASSWORD
     * Allow the new database user to manage the table
-      * `GRANT ALL PRIVILEGES ON catesa.* TO 'staff'@'localhost';
+      * `GRANT ALL PRIVILEGES ON catesa.* TO 'staff'@'localhost';`
     * Reload the privileges
       * `FLUSH PRIVILEGES;`
     * Exit and test that the new user can login
@@ -172,7 +172,7 @@ Everything from this point can be performed via the keyboard attached to the Ras
     `sudo /etc/init.d/nginx reload`
       
   * Test that PHP is working 
-    * `sudo mv /var/www/html/index.nginx-debian.html index.php`
+    * `sudo mv /var/www/html/index.nginx-debian.html /var/www/html/index.php`
     * `sudo nano /var/www/html/index.php`
       * Add `<?php echo phpinfo(); ?>` just before the `</body>` tag, save and exit the editor
     * Refresh your web browser and you should see the nginx welcome page followed by the PHP information

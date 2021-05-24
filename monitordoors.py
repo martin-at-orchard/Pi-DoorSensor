@@ -15,19 +15,6 @@ class MonitorDoors(Thread):
         self.inQueue = inQueue
         self.beepLock = beepLock
         self.display = display
-        self.enableresults = False
-
-        try:
-           with open('./config.json', 'r') as f:
-               config = json.load(f)
-
-               if 'enableresults' in config:
-                   if 'true' == config['enableresults']:
-                       self.enableresults = True
-
-        except Exception as e:
-            # Ignore error
-            pass
 
     def run(self):
         beepTask = Beep()
@@ -36,10 +23,6 @@ class MonitorDoors(Thread):
             try:
                 id, pinVal, now = self.inQueue.get()
                 self.display.update(id, pinVal, now.strftime("%c"))
-
-                if True == self.enableresults:
-                    dbConn = db.DB()
-                    dbConn.updateResults(id, pinVal, now)
 
                 if 1 == pinVal:
                     if False == self.beepLock.locked():

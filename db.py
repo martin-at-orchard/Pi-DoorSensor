@@ -42,7 +42,6 @@ class DB(Thread):
     def __init__(self):
         Thread.__init__(self)
 
-        self.enableresults = False
         self.user =  ''
         self.password = ''
         self.host = ''
@@ -52,10 +51,6 @@ class DB(Thread):
         try:
            with open('./config.json', 'r') as f:
                config = json.load(f)
-
-               if 'enableresults' in config:
-                   if 'true' == config['enableresults']:
-                       self.enableresults = True
 
                self.user = config['user']
                self.password = config['password']
@@ -111,31 +106,3 @@ class DB(Thread):
         conn.close()
 
         return data
-
-    #######################################################
-    #
-    # Update results in database only if the enableresults
-    # flag has been set
-    #
-    #######################################################
-
-    def updateResults(self, room, status, date):
-        if False == self.enableresults:
-            return
-
-        try:
-            conn = self.getConnection()
-            cur = conn.cursor(prepared=True)
-
-            sql = "INSERT INTO results (room, status, date) VALUES(%d, %d, %s)"
-            values = (room, status, date.strftime("%Y-%m-%d %H:%M:%S"))
-
-            cur.execute(sql, values)
-            conn.commit()
-
-        except Error as e:
-            # Ignore the error for now
-            pass
-
-        finally:
-            conn.close()

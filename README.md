@@ -253,37 +253,51 @@ Everything from this point can be performed via the keyboard attached to the Ras
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
     ALTER TABLE `rooms`
-      ADD PRIMARY KEY (`id`);
+      ADD PRIMARY KEY (`id`),
+      ADD KEY `fk_g_id` (`gpio`);
     ```
 
   * Insert the data into the rooms table
 
     ```sql
     INSERT INTO `rooms` (`id`, `enabled`, `gpio`, `displayorder`, `name`) VALUES
-      (1, 1, 4, 1, 'Room 1'),
-      (2, 1, 5, 2, 'Room 2'),
-      (3, 1, 6, 3, 'Room 3'),
-      (4, 1, 12, 4, 'Room 4'),
-      (5, 1, 13, 5, 'Room 5'),
-      (6, 1, 16, 6, 'Room 6'),
-      (7, 1, 17, 7, 'Room 7'),
-      (8, 1, 18, 8, 'Room 8'),
-      (9, 1, 19, 9, 'Room 9'),
-      (10, 1, 20, 10, 'Room 10'),
-      (11, 1, 21, 11, 'Room 11'),
-      (12, 1, 22, 12, 'Room 12'),
-      (13, 1, 23, 13, 'Room 13'),
-      (14, 1, 24, 14, 'Laundry Room'),
-      (15, 1, 25, 15, 'TV Room');
+    (1, 1, 4, 1, 'Room 1'),
+    (2, 1, 5, 2, 'Room 2'),
+    (3, 1, 6, 3, 'Room 3'),
+    (4, 1, 12, 4, 'Room 4'),
+    (5, 1, 13, 5, 'Room 5'),
+    (6, 1, 16, 8, 'Room 6'),
+    (7, 1, 17, 10, 'Room 7'),
+    (8, 1, 18, 11, 'Room 8'),
+    (9, 1, 19, 12, 'Room 9'),
+    (10, 1, 20, 14, 'Room 10'),
+    (11, 1, 21, 15, 'Room 11'),
+    (12, 1, 22, 16, 'Room 12'),
+    (13, 1, 23, 17, 'Room 13'),
+    (14, 1, 24, 18, 'Laundry Room'),
+    (15, 1, 25, 19, 'TV Room'),
+    (16, 1, 26, 6, 'Room 5P'),
+    (17, 1, 27, 9, 'Room 6P'),
+    (18, 1, 1, 100, 'GPIO 1'),
+    (19, 1, 2, 101, 'GPIO 2'),
+    (20, 1, 3, 102, 'GPIO 3'),
+    (21, 1, 7, 103, 'GPIO 7'),
+    (22, 1, 8, 104, 'GPIO 8'),
+    (23, 1, 9, 105, 'GPIO 9'),
+    (24, 1, 10, 106, 'GPIO 10'),
+    (25, 1, 11, 107, 'GPIO 11'),
+    (26, 1, 14, 108, 'GPIO 14'),
+    (27, 1, 15, 109, 'GPIO 15'),
+    (28, 1, 28, 110, 'GPIO 0');
 
     ALTER TABLE `rooms`
-      MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+      MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
     
     ALTER TABLE `rooms` 
       ADD CONSTRAINT `fk_g_id` FOREIGN KEY (`gpio`) REFERENCES `gpio`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
     ```
 
-    * Create the results table
+  * Create the results table
 
     ```sql
     CREATE TABLE `results` (

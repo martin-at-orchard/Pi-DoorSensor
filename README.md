@@ -19,8 +19,23 @@ which is connected to one side of the magnetic door switch. The other side of th
 
 ### Install the operating system
 
-* Download Rapsberry Pi OS (32-bit) Lite from [the Raspberry Pi Website](https://www.raspberrypi.org/downloads/raspberry-pi-os/)
-* Install it on the SSD using [belenaEtcher](https://www.balena.io/etcher/) or some other software
+* Download the Raspberry Pi Imager [the Raspberry Pi Website](https://www.raspberrypi.org/software)
+* Install it on your computer
+* Run the Raspberry Pi Imager
+* Under CHOOSE OS pick Raspberry Pi OS (other) then pick Raspberry Pi OS Lite (32-bit)
+* Under CHOOSE STORAGE pick the SSD or SD card you will be using
+* Press CTRL-SHIFT-X to bring up the customization menu
+* Set the host name to doorsensorpi (or something similar)
+* Click enable SSH and select Use password authentication
+* Ensure Set username and password is checked
+* Set the Username to pi
+* Set the Password to the pi's login password
+* Configure wifi (and set the credentials, WiFi country) if running over wifi or not if plugged into Ethernet
+* Check Set locale settings
+* Change timezone to America/Vancouver with Keyboard layout us
+* Check the Skip first-run wizard
+* Click Save
+* Click Write to burn the image to the SSD or SD card
 * Connect the Raspberry Pi to:
   * HDMI Monitor (need mini HDMI to HDMI cable)
   * Powered Speakers to the 3.5mm audio jack
@@ -31,70 +46,6 @@ which is connected to one side of the magnetic door switch. The other side of th
 * Boot the Raspberry Pi
   * **NOTE:** If using older firmware or an older Raspberry Pi OS you might need to configure the Raspberry Pi to be able to boot from SSD or use a micro SD card
   
-### Configure the Operating System
-
-* Login to the Raspberry Pi once it has finished booting
-  * User: pi
-  * Password: raspberry
-* Start up the Raspberry Pi configuration program
-  ```script
-  sudo raspi-config
-  ```
-  * Cursor down to `1 Change User Password`, press `Tab` to highlight `<Select>` then press `Enter`
-  
-    ** At the `You will now be asked to enter a new password for the pi user` press `Enter`
-    ** Enter the new password and confirmation of the password
-    ** At the `Password changed successfully` press `Enter`
-    
-  * Cursor down to `2 Network Options`, press `Tab` to highlight `<Select>` then press `Enter`
-  
-    ** Cursor down to `N1 Hostname`, press `Tab` to highlight `<Select>` then press `Enter`
-    ** At the hostname instructions, press `Enter`
-    ** At the `Please enter a hostname` enter an appropriate hostname `doorsensorpi` for example, press `Tab` to highlight `<Ok>` then press `Enter`
-  
-  * **Note:** Optionally set up the Wireless LAN. Cursor down to `2 Network Options`, press `Tab` to highlight `<Select>` then press `Enter`
-  
-    ** Cursor down to `N2 Wireless LAN`, press `Tab` to highlight `<Select>` then press `Enter`
-    ** Cursor down to select the country in which the Pi is to be used (`CA Canada`), press `Tab` to highlight `<Ok>` then press `Enter`
-    ** At the WiLAN country confirmation press `Enter`
-    ** Enter the SSID, press `Tab` to highlight `<Ok>` then press `Enter`
-    ** Enter the passphrase, press `Tab` to highlight `<Ok>` then press `Enter`
-    
-  * Cursor down to `5 Interfacing Options`, press `Tab` to highlight `<Select>` then press `Enter`
-  
-    ** Cursor down to `P2 SSH`, press `Tab` to highlight `<Select>` then press `Enter`
-    ** At the `Would you like the SSH server to be enabled?`, press `Tab` to highlight `<Yes>` then press `Enter`
-    ** At the `The SSH server is enabled` press `Enter`
-
-  * Cursor down to `7 Advanced Options`, press `Tab` to highlight `<Select>` then press `Enter`
-  
-    ** Cursor down to `A4 Audio`, press `Tab` to highlight `<Select>` then press `Enter`
-    ** Cursor down to `1 Headphones`, press `Tab` to highlight `<Ok>` then press `Enter`
-    
-  * **Note** Optionally change the locale from British English. Cursor down to `4 Localization Options`, press `Tab` to highlight `<Select>` then press `Enter`
-  
-    ** Cursor down to `I1 Change Locale`, press `Tab` to highlight `<Select>` then press `Enter`
-    ** Cursor or page down to find `en_CA.UTF-8 UTF-8` (or other locale), then press the `space bar` to enable
-    ** Cursor down to find `en_GB.UTF-8 UTF-8`, then press the `space bar` to disable
-    ** Press `Tab` to highlight `<Ok>` then press `Enter`
-    ** Cursor down to `en_CA.UTF-8`, press `Tab` to highlight `<Ok>` then press `Enter`
-    ** **NOTE:** The border of the configuration program might look odd, ignore it
-    
-  * **Note** Optionally change the timezone from GMT. Cursor down to `4 Localization Options`, press `Tab` to highlight `<Select>` then press `Enter`
-  
-    ** Cursor down to `I2 Change Time Zone`, press `Tab` to highlight `<Select>` then press `Enter`
-    ** Cursor down to `America` (or other location), press `Tab` to highlight `<Ok>` then press `Enter`
-    ** Cursor or page down to `Vancouver` (or other timezone), press `Tab` to highlight `<Ok>` then press `Enter`
- 
-  * **Note** Optionally change the keyboard from English. Cursor down to `4 Localization Options`, press `Tab` to highlight `<Select>` then press `Enter`
-  
-    ** Cursor down to `I3 Change Keyboard Layout`, press `Tab` to highlight `<Select>` then press `Enter`
-    ** Pick an appropirate keyboard.
-    
-  * Press `Tab` twice to highlight `<Finish>` then press Enter
-  * If the system prompts you to reboot press Enter to reboot
-    If not at the prompt enter `sudo reboot` to reboot the Pi
-    
 ### Update and install all required software
 
 Everything from this point can be performed via the keyboard attached to the Raspberry Pi or via SSH
@@ -278,17 +229,13 @@ Everything from this point can be performed via the keyboard attached to the Ras
     (15, 1, 25, 19, 'TV Room'),
     (16, 1, 26, 6, 'Room 5P'),
     (17, 1, 27, 9, 'Room 6P'),
-    (18, 1, 1, 100, 'GPIO 1'),
-    (19, 1, 2, 101, 'GPIO 2'),
-    (20, 1, 3, 102, 'GPIO 3'),
-    (21, 1, 7, 103, 'GPIO 7'),
-    (22, 1, 8, 104, 'GPIO 8'),
-    (23, 1, 9, 105, 'GPIO 9'),
-    (24, 1, 10, 106, 'GPIO 10'),
-    (25, 1, 11, 107, 'GPIO 11'),
-    (26, 1, 14, 108, 'GPIO 14'),
-    (27, 1, 15, 109, 'GPIO 15'),
-    (28, 1, 28, 110, 'GPIO 0');
+    (21, 1, 7, 7, 'GPIO 7'),
+    (22, 1, 8, 13, 'GPIO 8'),
+    (23, 1, 9, 20, 'GPIO 9'),
+    (24, 1, 10, 21, 'GPIO 10'),
+    (25, 1, 11, 22, 'GPIO 11'),
+    (26, 1, 14, 23, 'GPIO 14'),
+    (27, 1, 15, 24, 'GPIO 15'),
 
     ALTER TABLE `rooms`
       MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
@@ -345,30 +292,20 @@ Everything from this point can be performed via the keyboard attached to the Ras
 * Start up the program 
   `./doorsensor`
 
-## DEBUGGING
+## Set up program for autostart
 
-### PhpMyAdmin and PHP 7.3
+* In pi's .bashrc (add the following at the end)
+  ```bash
+  cd /home/pi/work/doorsensor
+  ./doorsensor.py
+  ```
 
-There is a bug with the current PhpMyAdmin (4.6.6deb5) and the current PHP (7.3.19-1~deb10u1)
-that displays an error when displaying the results of a query or browsing a table.
-Apparently this is fixed in PhpMyAdmin 4.8.3 and above, but this isn't available through
-the normal `apt install` process right now.
+## Optional
 
-They can be fixed by this **HACK**
-
-In the directory `/usr/share/phpmyadmin/libraries` make changes to the following files
-
-**plugin_interface.lib.php**
-Change line **551**
-From `if ($options != null && count($options) > 0) {`
-To   `if ($options != null && (is_array($options) || $options instanceof Countable) && count($options) > 0) {`
-
-**sql.lib.php**
-Change line **613**
-From `|| (count($analyzed_sql_results['select_expr'] == 1)`
-To   `|| ((count($analyzed_sql_results['select_expr']) == 1)`
-
-**Restart nginx**
-```script
-sudo /etc/init.d/nginx restart
+* Add a user to the system that has the same credentials as the pi to manage without running the doorsensor program
+* At the command prompt (the groups pi command is to get the list of groups the pi user can use which is used in the for GROUP command)
+```
+sudo adduser USERNAME
+groups pi
+for GROUP in adm dialout cdrom sudo audio video plugdev games users netdev input spi i2c gpio; do sudo adduser username $GROUP; done
 ```

@@ -90,7 +90,8 @@ class Display(Thread):
     ###################################################
     def setup(self, displayData):
         num = 0
-        self.displayOrder = [0] * (len(displayData) + 1)
+        maxGpio = 28
+        self.displayOrder = [0] * (maxGpio + 1)
         for rid, roomname, pinVal in displayData:
             now = datetime.now()
             nowStr = now.strftime("%c")
